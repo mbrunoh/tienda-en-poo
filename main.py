@@ -14,9 +14,15 @@ class Producto:
     @property
     def nombre(self):
         return self.__nombre
+    @nombre.setter
+    def nombre(self, nombre):
+        self.__nombre = nombre
     @property
     def precio(self):
         return self.__precio
+    @precio.setter
+    def precio(self, precio):
+        self.__precio = precio
     @property
     def stock(self):
         return self.__stock
@@ -44,7 +50,7 @@ def buscar_producto(n_producto):
 
 def registrar_producto():
     system('clear')
-    header('REGISTRAR NUEVO PRODUCTO')
+    header('NUEVO PRODUCTO')
     while True:
         nombre = input('Nombre del producto: ').strip().capitalize()
         if not buscar_producto(nombre):
@@ -53,7 +59,7 @@ def registrar_producto():
             print(f'ERROR ---> El producto [{nombre}] ya existe!')
     while True:
         try:
-            precio = float(input('Precio: '))
+            precio = float(input('Precio: $ '))
         except:
             print('ERROR ---> Precio inválido!')
         else:
@@ -91,26 +97,89 @@ def comprar():
         if not producto:
             print(f'ERROR ---> El producto {name} no existe en la tienda!')
         else:
-            
             break
     while True:
         try:
-            cantidad = int(input('¿Que cantidad desea comprar? '))
+            cantidad = int(input('Cantidad: '))
         except:
             print('ERROR ---> Cantidad inválida!')
         else:
             break
-    print(f'Usted está comprando {cantidad} de {producto.nombre}. El total es: $ {cantidad * producto.precio:.2f}')
+    producto.stock += cantidad
+    print('Compra realizada con suceso!')   
+    input('[ENTER]')
+
+def vender():
+    system('clear')
+    header('VENTA AL CLIENTE')
     while True:
-        opt = input('Confirma la compra? [s/n] ').lower()
+        name = input('¿Que producto desea vender? ').strip().capitalize()
+        producto = buscar_producto(name)
+        if not producto:
+            print(f'ERROR ---> El producto {name} no existe en la tienda!')
+        else:
+            break
+    while True:
+        try:
+            cantidad = int(input('Cantidad: '))
+        except:
+            print('ERROR ---> Cantidad inválida!')
+        else:
+            if producto.stock < cantidad:
+                print('No es posible realizar la venta porque no hay cantidad suficiente!')
+                print(f'Stock: {producto.stock}')
+            else:
+                break
+    print(f'Usted está vendiendo {cantidad} de {producto.nombre}. El total es: $ {cantidad * producto.precio:.2f}')
+    while True:
+        opt = input('Confirma la venta? [s/n] ').lower()
         if opt == 's':
-            producto.stock = producto.stock + cantidad
-            print('Compra realizada con suceso!')
+            producto.stock -= cantidad
+            print('Venta realizada con suceso!')
             break
         elif opt =='n':
             print('La compra no fue realizada!')
             break
-    
+    input('[ENTER]')
+
+def edit():
+    system('clear')
+    header('EDITAR PRODUCTO')
+    while True:
+        name = input('¿Que producto desea editar? ').strip().capitalize()
+        producto = buscar_producto(name)
+        if not producto:
+            print(f'ERROR ---> El producto {name} no existe en la tienda!')
+        else:
+            break
+    system('clear')
+    header(f'{producto.nombre} | Precio: {producto.precio:.2f}')
+    print('1 - Nombre')
+    print('2 - Precio')
+    print()
+    while True:
+        opc = input('¿Que desea editar?')
+        if opc == '1':
+            while True:
+                nombre = input('Nuevo nombre: ').strip().capitalize()
+                if not buscar_producto(nombre):
+                    producto.nombre = nombre
+                    print('Nombre del producto actualizado con suceso!')
+                    break
+                else:
+                    print('Ya existe un producto con este nombre!')
+            break
+        elif opc == '2':
+            while True:
+                try:
+                    precio = float(input('Nuevo precio: $ '))
+                except:
+                    print('Precio inválido!')
+                else:
+                    producto.precio = precio
+                    print('Precio del producto actualizado con suceso!')
+                    break
+            break
     input('[ENTER]')
 
 def menu():
@@ -119,8 +188,9 @@ def menu():
         header('TIENDA')
         print('1 - Registrar producto')
         print('2 - Vender')
-        print('3 - Comprar')
+        print('3 - Comprar para Stock')
         print('4 - Stock de productos')
+        print('5 - Editar Nombre/Precio')
         print('0 - Salir')
         print()
         opt = input('Opción: ')
@@ -128,11 +198,13 @@ def menu():
             case '1':
                 registrar_producto()
             case '2':
-                pass
+                vender()
             case '3':
                 comprar()
             case '4':
                 mostrar_productos()
+            case '5':
+                edit()
             case '0':
                 break
             case _:
