@@ -1,5 +1,7 @@
 from os import system
 from time import sleep
+import pandas as pd
+import csv
 from herramientas import header
 
 class Producto:
@@ -35,10 +37,6 @@ class Producto:
     @classmethod
     def lista_productos(self):
         return self.__productos
-
-Producto('Banana', 50.00, 5)
-Producto('Manzana', 100.00, 15)
-Producto('Uva', 1850.00, 10)
 
 def buscar_producto(n_producto):
     lista_productos = list(Producto.lista_productos().values())
@@ -142,6 +140,28 @@ def vender():
             break
     input('[ENTER]')
 
+def archivo_csv(method):
+    if method == 'save':
+        lista_productos = list(Producto.lista_productos().values())
+        df_productos = []
+        for producto in lista_productos:
+            temp = {
+                'nombre':producto.nombre,
+                'precio':producto.precio,
+                'stock':producto.stock
+            }
+            df_productos.append(temp)
+        df = pd.DataFrame(df_productos)
+        df.to_csv('database.csv', index=False)
+    elif method == 'load':
+        try:
+            df = pd.read_csv('database.csv')
+        except:
+            pass
+        else:
+            for row in df.itertuples(index=False):
+                Producto(row.nombre, row.precio, row.stock)
+
 def edit():
     system('clear')
     header('EDITAR PRODUCTO')
@@ -206,10 +226,13 @@ def menu():
             case '5':
                 edit()
             case '0':
+                archivo_csv('save')
                 break
             case _:
                 print('ERROR ---> Opción inválida!')
                 sleep(0.2)
                 pass
+
+archivo_csv('load')
 
 menu()
